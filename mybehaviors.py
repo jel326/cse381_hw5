@@ -33,7 +33,26 @@ def treeSpec(agent):
 	myid = str(agent.getTeam())
 	spec = None
 	### YOUR CODE GOES BELOW HERE ###
-
+	#Plan:
+	# Low HP --> Retreat and heal 
+	# Healthy --> fight enemy hero 
+	# Farm minions and gain exp 
+	spec = [
+		Selector, 
+			(Retreat, 0.5, "retreat! hp<50%"), 
+   				[(HitpointDaemon, 0.8, "hp>80%, fight!"),
+					[(BuffDaemon, 1, "buff up"),
+						[(Sequence, "fight hero"),
+							(ChaseHero, "chase hero"),
+							(KillHero, "kill hero")
+						]
+					]
+                ],
+				[(Sequence, "farm minions"),
+     				(ChaseMinion, "chase minions"),
+					(KillMinion, "kill minions")
+          		]
+	]
 	### YOUR CODE GOES ABOVE HERE ###
 	return spec
 
@@ -41,7 +60,32 @@ def myBuildTree(agent):
 	myid = str(agent.getTeam())
 	root = None
 	### YOUR CODE GOES BELOW HERE ###
-	
+	root = makeNode(Selector, agent)
+ 
+	#Same plan as above 
+	#Retreat when HP > 50%
+	retreat = makeNode(Retreat, agent, 0.5, "retreat! hp<50%")
+	root.addChild(retreat)
+ 
+	#Fight hero when HP >= 60%
+	hp = makeNode(HitpointDaemon, agent, 0.8, "hp>80%, fight!")
+	buffUp = makeNode(BuffDaemon, agent, 1, "buff up!")
+	fightSeqeunce = makeNode(Sequence, agent, "fight hero")
+	chaseSequence = makeNode(ChaseHero, agent, "chase hero")
+	fightSeqeunce.addChild(chaseSequence)
+	killSeqeunce = makeNode(KillHero, agent, "kill hero")
+	fightSeqeunce.addChild(killSeqeunce)		#fight, chase, kill the other hero
+	buffUp.addChild(fightSeqeunce)		#buff up before the fight esequence 
+	hp.addChild(buffUp)	#add buffing and fighting sequence when HP > 80%
+	root.addChild(hp)
+ 
+	#Farm Minions when nothing going on 
+	farmSequence = makeNode(Sequence, agent, "farm minions")
+	chaseMinionSequence = makeNode(ChaseMinion, agent, "chase minion")
+	killMinionSequqnce = makeNode(KillMinion, agent, "kill minion")
+	farmSequence.addChild(chaseMinionSequence)		#chase and then kill minion  
+	farmSequence.addChild(killMinionSequqnce)
+	root.addChild(farmSequence)
 	### YOUR CODE GOES ABOVE HERE ###
 	return root
 

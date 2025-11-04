@@ -176,7 +176,7 @@ class Selector(BTNode):
 		#child fails --> move onto next chikld
 		elif result == False:
 			self.current += 1
-			return False
+			return None
 		else:
 			return None
 		### YOUR CODE GOES ABOVE HERE ###
