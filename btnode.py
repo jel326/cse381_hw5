@@ -126,9 +126,25 @@ class Sequence(BTNode):
 	def execute(self, delta = 0):
 		BTNode.execute(self, delta)
 		### YOUR CODE GOES BELOW HERE ###
-
+		#if sequeunce has no children --> suceed 
+		if len(self.children) == 0:
+			return True
+		childIndex = self.current
+		if childIndex >= len(self.children):		#tried all children already
+			self.current = 0
+			return True
+		#proceed with current child
+		result  = self.children[childIndex].execute(delta)
+		if result == True:		
+			self.current += 1		#child suceed --> sequence goes onto next
+			return None
+		elif result == False:
+			self.current = 0		#fail the whole sequence
+			return False	
+		else:
+			return None
 		### YOUR CODE GOES ABOVE HERE ###
-		return True
+		#return True
 
 ###########################
 ### Selector
@@ -145,9 +161,26 @@ class Selector(BTNode):
 	def execute(self, delta = 0):
 		BTNode.execute(self, delta)
 		### YOUR CODE GOES BELOW HERE ###
-
+		#No children --> fails
+		if len(self.children) == 0:
+			return False
+		childIndex = self.current
+		if childIndex >= len(self.children):
+			self.current = 0
+			return False
+		result = self.children[childIndex].execute(delta)
+		#child suceeds --> seleector suceeds and reset
+		if result == True:
+			self.current = 0
+			return True
+		#child fails --> move onto next chikld
+		elif result == False:
+			self.current += 1
+			return False
+		else:
+			return None
 		### YOUR CODE GOES ABOVE HERE ###
-		return False
+		#return False
 
 
 
